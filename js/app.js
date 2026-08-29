@@ -814,7 +814,7 @@ const App = {
         this.publishedImages = existing.images || [];
       }
     } else {
-      this.publishedImages = [PRODUCT_ART.papa];
+      this.publishedImages = [];
     }
 
     const zonesOptions = TARIJA_ZONES.map(z => `
@@ -1079,7 +1079,7 @@ const App = {
 
     return this.publishedImages.map((img, idx) => `
       <div class="preview-item">
-        <img src="${img}" alt="Foto ${idx + 1}" class="preview-thumb" />
+        <img class="preview-thumb" ${UI.getImgAttrs(img, 'Foto ' + (idx + 1))} />
         <button type="button" class="btn-remove-photo" aria-label="Eliminar foto" onclick="App.removePublishedImage(${idx})">&times;</button>
       </div>
     `).join('');
@@ -1454,7 +1454,7 @@ const App = {
         <!-- Media Gallery -->
         <div class="lot-detail-gallery">
           <div class="main-image-wrap">
-            <img id="detail-main-image" src="${mainImg}" alt="${lot.product}" class="detail-hero-img" />
+            <img id="detail-main-image" class="detail-hero-img" ${UI.getImgAttrs(mainImg, lot.product)} />
             <div class="detail-badges">
               ${(lot.quickExit || lot.commercialReason === 'Salida rápida') ? `<span class="badge badge-urgent"><span class="badge-dot"></span> Salida rápida</span>` : ''}
               ${lot.isFeatured ? `<span class="badge badge-featured">★ Destacado</span>` : ''}
@@ -1464,7 +1464,9 @@ const App = {
           ${lot.images && lot.images.length > 1 ? `
             <div class="detail-thumbs-strip">
               ${lot.images.map((img, idx) => `
-                <img src="${img}" alt="Foto ${idx + 1}" class="thumb-strip-item ${idx === 0 ? 'active' : ''}" onclick="App.switchDetailMainImage('${img}', this)" />
+                <img class="thumb-strip-item ${idx === 0 ? 'active' : ''}" 
+                     ${UI.getImgAttrs(img, lot.product + ' foto ' + (idx+1))}
+                     onclick="App.switchDetailMainImage('${img}', this)" />
               `).join('')}
             </div>
           ` : ''}

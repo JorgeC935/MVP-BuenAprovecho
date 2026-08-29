@@ -1,15 +1,19 @@
 /**
  * BuenAprovecho - Seed Data and Constants
  * Pilot Location: Tarija, Bolivia
+ *
+ * IMAGES: Unsplash free-use photos (no account required, no watermark).
+ * All URLs use the Unsplash CDN with explicit size params for performance.
+ * Fallback gradient + emoji is handled via onerror in UI renderers.
  */
 
 const PRODUCT_CATEGORIES = [
-  { id: 'all', name: 'Todos', icon: '🧺' },
-  { id: 'tuberculos', name: 'Tubérculos', icon: '🥔' },
-  { id: 'hortalizas', name: 'Hortalizas', icon: '🧅' },
-  { id: 'citricos', name: 'Cítricos', icon: '🍊' },
-  { id: 'frutas', name: 'Frutas', icon: '🍎' },
-  { id: 'cucurbitaceas', name: 'Zapallos', icon: '🎃' }
+  { id: 'all',          name: 'Todos',      icon: '🧺' },
+  { id: 'tuberculos',   name: 'Tubérculos', icon: '🥔' },
+  { id: 'hortalizas',  name: 'Hortalizas', icon: '🧅' },
+  { id: 'citricos',    name: 'Cítricos',   icon: '🍊' },
+  { id: 'frutas',      name: 'Frutas',     icon: '🍎' },
+  { id: 'cucurbitaceas', name: 'Zapallos',  icon: '🎃' }
 ];
 
 const TARIJA_ZONES = [
@@ -24,15 +28,15 @@ const TARIJA_ZONES = [
 ];
 
 const SELLER_TYPES = [
-  { id: 'productor', name: 'Productor Agrícola' },
-  { id: 'mayorista', name: 'Mayorista / Distribuidor' },
+  { id: 'productor',   name: 'Productor Agrícola' },
+  { id: 'mayorista',  name: 'Mayorista / Distribuidor' },
   { id: 'comerciante', name: 'Comerciante de Mercado' }
 ];
 
 const BUYER_TYPES = [
-  { id: 'hogar', name: 'Hogar / Familia' },
+  { id: 'hogar',       name: 'Hogar / Familia' },
   { id: 'gastronomico', name: 'Pequeño negocio gastronómico' },
-  { id: 'general', name: 'Comprador general' }
+  { id: 'general',    name: 'Comprador general' }
 ];
 
 const COMMERCIAL_REASONS = [
@@ -51,11 +55,11 @@ const COMMERCIAL_CONDITIONS = [
 ];
 
 const UNITS = [
-  { id: 'kg', name: 'Kilogramos (kg)' },
-  { id: 'bolsa', name: 'Bolsas / Quintales' },
-  { id: 'caja', name: 'Cajas' },
+  { id: 'kg',     name: 'Kilogramos (kg)' },
+  { id: 'bolsa',  name: 'Bolsas / Quintales' },
+  { id: 'caja',   name: 'Cajas' },
   { id: 'unidad', name: 'Unidades' },
-  { id: 'lote', name: 'Lote completo' }
+  { id: 'lote',   name: 'Lote completo' }
 ];
 
 const PRICE_MODALITIES = [
@@ -66,19 +70,97 @@ const PRICE_MODALITIES = [
   'Precio total del lote'
 ];
 
-// Curated high quality SVG visual product artworks
-const PRODUCT_ART = {
-  papa: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23f4ede4"/><circle cx="200" cy="150" r="110" fill="%23d8b589" opacity="0.3"/><path d="M110 160 C90 110, 160 80, 240 90 C300 100, 320 160, 290 200 C250 240, 140 230, 110 160 Z" fill="%23c49a6c"/><circle cx="160" cy="130" r="4" fill="%239c7144"/><circle cx="220" cy="120" r="5" fill="%239c7144"/><circle cx="260" cy="160" r="4" fill="%239c7144"/><circle cx="190" cy="180" r="4" fill="%239c7144"/><circle cx="140" cy="170" r="3" fill="%239c7144"/><path d="M120 180 C80 180, 70 240, 140 250 C180 260, 210 210, 170 190 Z" fill="%23b88b5b"/><circle cx="120" cy="220" r="3" fill="%238a5e33"/><circle cx="160" cy="230" r="3" fill="%238a5e33"/><path d="M240 180 C230 220, 290 260, 330 230 C360 200, 320 160, 270 170 Z" fill="%23d2a677"/><circle cx="280" cy="210" r="4" fill="%239c7144"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%238a5e33" opacity="0.6">Papa Holandesa / Deseret</text></svg>`,
-  cebolla: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23faece8"/><circle cx="200" cy="150" r="110" fill="%23e89582" opacity="0.25"/><path d="M140 170 C130 90, 250 90, 250 170 C250 230, 140 230, 140 170 Z" fill="%23c24d40"/><path d="M150 170 C145 105, 235 105, 235 170 C235 220, 150 220, 150 170 Z" fill="%23a83226"/><path d="M190 95 L195 65 L205 65 L200 95 Z" fill="%235a8a40"/><path d="M195 230 L193 250 M200 230 L202 248 M188 228 L185 245" stroke="%23d9a779" stroke-width="2.5" stroke-linecap="round"/><path d="M220 180 C210 130, 290 130, 290 180 C290 220, 220 220, 220 180 Z" fill="%23d96557" opacity="0.9"/><path d="M255 130 L258 110" stroke="%235a8a40" stroke-width="3"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23a83226" opacity="0.6">Cebolla Roja / Morada</text></svg>`,
-  zanahoria: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23fdf1e6"/><circle cx="200" cy="150" r="110" fill="%23f29339" opacity="0.2"/><path d="M140 80 Q220 120 280 230 C270 235 255 225 210 170 C165 120 135 90 140 80 Z" fill="%23eb6b20"/><path d="M170 120 L155 125 M200 150 L185 156 M230 185 L215 190 M255 215 L245 220" stroke="%23c24d08" stroke-width="2" stroke-linecap="round"/><path d="M140 80 C130 50 100 40 90 45 C100 65 120 75 135 80 Z" fill="%23438a2e"/><path d="M140 75 C145 40 130 30 120 30 C125 55 135 70 140 75 Z" fill="%23347022"/><path d="M145 80 C160 50 180 45 190 55 C175 70 155 78 145 80 Z" fill="%23438a2e"/><path d="M100 120 Q160 170 210 260 C200 265 185 255 150 205 C115 160 95 130 100 120 Z" fill="%23f57c2a" opacity="0.85"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23c24d08" opacity="0.6">Zanahoria Fresca</text></svg>`,
-  zapallo: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23fef6e9"/><circle cx="200" cy="150" r="110" fill="%23e89520" opacity="0.2"/><path d="M130 170 C130 105, 170 100, 200 100 C230 100, 270 105, 270 170 C270 235, 230 240, 200 240 C170 240, 130 235, 130 170 Z" fill="%23e67e22"/><path d="M155 170 C155 115, 180 105, 200 105 C220 105, 245 115, 245 170 C245 225, 220 235, 200 235 C180 235, 155 225, 155 170 Z" fill="%23d35400"/><path d="M180 170 C180 120, 190 110, 200 110 C210 110, 220 120, 220 170 C220 220, 210 230, 200 230 C190 230, 180 220, 180 170 Z" fill="%23e67e22"/><path d="M195 105 C190 70, 215 65, 210 50 C200 65, 200 85, 205 105 Z" fill="%2327ae60"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23d35400" opacity="0.6">Zapallo Criollo / Plomo</text></svg>`,
-  manzana: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23fcecee"/><circle cx="200" cy="150" r="110" fill="%23d9383a" opacity="0.2"/><path d="M195 100 C150 70, 120 120, 125 180 C130 230, 175 245, 195 225 C215 245, 260 230, 265 180 C270 120, 240 70, 195 100 Z" fill="%23c0392b"/><path d="M195 105 C200 70, 210 60, 215 50 M195 105 C205 85, 225 80, 240 85 C230 100, 210 102, 195 105" stroke="%236e4720" stroke-width="4" stroke-linecap="round" fill="%2327ae60"/><ellipse cx="160" cy="140" rx="12" ry="30" transform="rotate(-20 160 140)" fill="%23e74c3c" opacity="0.6"/><circle cx="150" cy="130" r="4" fill="%23ffffff" opacity="0.7"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23c0392b" opacity="0.6">Manzana de Valle</text></svg>`,
-  naranja: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23fef4e8"/><circle cx="200" cy="150" r="110" fill="%23f39c12" opacity="0.2"/><circle cx="195" cy="165" r="75" fill="%23e67e22"/><circle cx="190" cy="160" r="70" fill="%23f39c12"/><path d="M190 90 C185 75 195 65 210 65 C205 78 198 85 190 90 Z" fill="%2327ae60"/><circle cx="190" cy="92" r="3" fill="%23a05a0d"/><circle cx="160" cy="140" r="1" fill="%23d35400"/><circle cx="210" cy="170" r="1.5" fill="%23d35400"/><circle cx="175" cy="190" r="1.5" fill="%23d35400"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23e67e22" opacity="0.6">Naranja Dulce Bermejo</text></svg>`,
-  mandarina: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23fff5ea"/><circle cx="200" cy="150" r="110" fill="%23fa8231" opacity="0.2"/><ellipse cx="190" cy="165" rx="75" ry="60" fill="%23fa8231"/><ellipse cx="188" cy="162" rx="70" ry="56" fill="%23fd9644"/><path d="M188 106 C180 90 200 80 215 85 C205 98 196 102 188 106 Z" fill="%2326de81"/><circle cx="188" cy="107" r="3" fill="%23b85305"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23fa8231" opacity="0.6">Mandarina Criolla</text></svg>`,
-  limon: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23f6fae8"/><circle cx="200" cy="150" r="110" fill="%2398cc2e" opacity="0.2"/><path d="M125 155 C120 100, 260 100, 265 155 C260 210, 120 210, 125 155 Z" transform="rotate(-15 195 155)" fill="%2385c219"/><circle cx="190" cy="150" r="45" fill="%23a2db37" opacity="0.7"/><path d="M265 135 L275 132 M125 175 L115 178" stroke="%23689c10" stroke-width="4" stroke-linecap="round"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23689c10" opacity="0.6">Limón Sutil / Criollo</text></svg>`
+// ---------------------------------------------------------------------------
+// PRODUCT PHOTOS
+// ---------------------------------------------------------------------------
+// Primary: Unsplash CDN images (real photographs, no watermarks, no text).
+// Format: ?w=800&q=80&auto=format&fit=crop for optimised loading.
+// Each key also carries a `fallbackGradient` and `emoji` used when the
+// network photo fails (onerror handler attached in renderLotCard).
+// ---------------------------------------------------------------------------
+const PRODUCT_PHOTOS = {
+  papa: {
+    url: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #c49a6c 0%, #8a5e33 100%)',
+    emoji: '🥔',
+    label: 'Papa'
+  },
+  papa2: {
+    url: 'https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #d2a677 0%, #9c7144 100%)',
+    emoji: '🥔',
+    label: 'Papa'
+  },
+  cebolla: {
+    url: 'https://images.unsplash.com/photo-1508747703725-719777637510?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #c24d40 0%, #7a1c14 100%)',
+    emoji: '🧅',
+    label: 'Cebolla'
+  },
+  cebolla2: {
+    url: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #d96557 0%, #a83226 100%)',
+    emoji: '🧅',
+    label: 'Cebolla'
+  },
+  zanahoria: {
+    url: 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #f57c2a 0%, #c24d08 100%)',
+    emoji: '🥕',
+    label: 'Zanahoria'
+  },
+  zapallo: {
+    url: 'https://images.unsplash.com/photo-1570586437263-ab629fccc818?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #e67e22 0%, #d35400 100%)',
+    emoji: '🎃',
+    label: 'Zapallo'
+  },
+  zapallo2: {
+    url: 'https://images.unsplash.com/photo-1508522236-82f2df9052f7?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #f39c12 0%, #d35400 100%)',
+    emoji: '🎃',
+    label: 'Zapallo'
+  },
+  manzana: {
+    url: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+    emoji: '🍎',
+    label: 'Manzana'
+  },
+  naranja: {
+    url: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #f39c12 0%, #e67e22 100%)',
+    emoji: '🍊',
+    label: 'Naranja'
+  },
+  naranja2: {
+    url: 'https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #f39c12 0%, #c0680a 100%)',
+    emoji: '🍊',
+    label: 'Naranja'
+  },
+  mandarina: {
+    url: 'https://images.unsplash.com/photo-1582354801169-eb1b26ae5711?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #fd9644 0%, #fa8231 100%)',
+    emoji: '🍊',
+    label: 'Mandarina'
+  },
+  limon: {
+    url: 'https://images.unsplash.com/photo-1590502593747-42a996133562?w=800&q=80&auto=format&fit=crop',
+    fallbackGradient: 'linear-gradient(135deg, #a2db37 0%, #689c10 100%)',
+    emoji: '🍋',
+    label: 'Limón'
+  }
 };
 
+// Backwards compat: PRODUCT_ART now points to photo URLs (used by preset picker)
+const PRODUCT_ART = Object.fromEntries(
+  Object.entries(PRODUCT_PHOTOS).map(([k, v]) => [k, v.url])
+);
+
+// ---------------------------------------------------------------------------
 // Quick-fill presets for ultra-fast seller publishing (1-tap setup)
+// ---------------------------------------------------------------------------
 const QUICK_PUBLISH_PRESETS = [
   {
     key: 'papa',
@@ -156,7 +238,7 @@ const QUICK_PUBLISH_PRESETS = [
     allowPartial: true,
     minPurchase: 10,
     commercialReason: 'Baja rotación',
-    commercialCondition: 'Sobrestock de temporada',
+    commercialCondition: 'Excedente de cosecha fresca',
     imageKey: 'zapallo',
     description: 'Zapallo criollo con pulpa cremosa y rendidora. Precio conveniente por cantidad.'
   },
@@ -178,6 +260,9 @@ const QUICK_PUBLISH_PRESETS = [
   }
 ];
 
+// ---------------------------------------------------------------------------
+// Demo Lots — fictional sellers, generic Tarija zones, real product photos
+// ---------------------------------------------------------------------------
 const INITIAL_DEMO_LOTS = [
   {
     id: 'lot-01',
@@ -201,8 +286,8 @@ const INITIAL_DEMO_LOTS = [
     sellerPhone: '+59172981234',
     sellerRating: 4.8,
     sellerReviewsCount: 14,
-    description: 'Lote de papa seleccionada de segunda categoría, ideal para restaurantes, pollerías o consumo familiar. Excelente sabor y consistencia, solo calibre no estándar.',
-    images: [PRODUCT_ART.papa],
+    description: 'Lote de papa de segunda categoría con excelente sabor y consistencia. Calibre variado, ideal para restaurantes, pollerías o consumo familiar.',
+    images: [PRODUCT_PHOTOS.papa.url, PRODUCT_PHOTOS.papa2.url],
     publishedAt: '2026-08-29T06:30:00Z',
     viewsCount: 48,
     favoritesCount: 9,
@@ -212,7 +297,7 @@ const INITIAL_DEMO_LOTS = [
   },
   {
     id: 'lot-02',
-    product: 'Cebolla Roja de Valle (Excedente)',
+    product: 'Cebolla Roja de Valle (Excedente de Cosecha)',
     category: 'hortalizas',
     quantity: 40,
     unit: 'bolsa',
@@ -233,7 +318,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.9,
     sellerReviewsCount: 22,
     description: 'Llegada de camión con excedente de cosecha desde San Lorenzo. Cebolla firme, bien seca, lista para guardar o consumo inmediato.',
-    images: [PRODUCT_ART.cebolla],
+    images: [PRODUCT_PHOTOS.cebolla.url],
     publishedAt: '2026-08-29T07:15:00Z',
     viewsCount: 67,
     favoritesCount: 12,
@@ -243,7 +328,7 @@ const INITIAL_DEMO_LOTS = [
   },
   {
     id: 'lot-03',
-    product: 'Zanahoria de Campo (Forma Irregular)',
+    product: 'Zanahoria de Campo (Segunda Selección)',
     category: 'hortalizas',
     quantity: 200,
     unit: 'kg',
@@ -264,7 +349,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.7,
     sellerReviewsCount: 9,
     description: 'Zanahorias dulces y frescas con formas bifurcadas o curvas que los supermercados no reciben. 100% aptas para jugos, sopas o rallado.',
-    images: [PRODUCT_ART.zanahoria],
+    images: [PRODUCT_PHOTOS.zanahoria.url],
     publishedAt: '2026-08-28T16:20:00Z',
     viewsCount: 31,
     favoritesCount: 5,
@@ -295,7 +380,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.8,
     sellerReviewsCount: 18,
     description: 'Naranjas muy jugosas en punto óptimo de dulzura. Cáscara con detalles de sol pero pulpa de primera calidad. Se busca salida en 48 hrs.',
-    images: [PRODUCT_ART.naranja],
+    images: [PRODUCT_PHOTOS.naranja.url, PRODUCT_PHOTOS.naranja2.url],
     publishedAt: '2026-08-29T05:40:00Z',
     viewsCount: 59,
     favoritesCount: 11,
@@ -316,7 +401,7 @@ const INITIAL_DEMO_LOTS = [
     negotiable: true,
     quickExit: false,
     commercialReason: 'Baja rotación',
-    commercialCondition: 'Sobrestock de temporada',
+    commercialCondition: 'Excedente de cosecha fresca',
     location: 'Zona Senac',
     locationRef: 'Av. Las Américas frente a la plazuela',
     pickupSchedule: '10:00 a 17:00',
@@ -326,7 +411,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.9,
     sellerReviewsCount: 22,
     description: 'Zapallos criollos de gran tamaño cosechados en Paicho. Carne amarilla intensa y cremosa. Precio especial por cantidad.',
-    images: [PRODUCT_ART.zapallo],
+    images: [PRODUCT_PHOTOS.zapallo.url],
     publishedAt: '2026-08-28T14:10:00Z',
     viewsCount: 28,
     favoritesCount: 4,
@@ -357,7 +442,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.7,
     sellerReviewsCount: 9,
     description: 'Mandarinas aromáticas y muy dulces. La cáscara tiene marcas de viento y ramas pero la fruta interna está perfecta e hidratada.',
-    images: [PRODUCT_ART.mandarina],
+    images: [PRODUCT_PHOTOS.mandarina.url],
     publishedAt: '2026-08-29T08:00:00Z',
     viewsCount: 39,
     favoritesCount: 7,
@@ -388,7 +473,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.6,
     sellerReviewsCount: 18,
     description: 'Manzanas tarijeñas aromáticas y crujientes. Calibres mixtos en cada caja. Perfectas para consumo de mesa, repostería o licuados.',
-    images: [PRODUCT_ART.manzana],
+    images: [PRODUCT_PHOTOS.manzana.url],
     publishedAt: '2026-08-27T18:00:00Z',
     viewsCount: 45,
     favoritesCount: 11,
@@ -419,7 +504,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.8,
     sellerReviewsCount: 14,
     description: 'Limón con alto contenido de jugo, tamaño pequeño a mediano. Ideal para cevicherías, bares, pensiones o consumo familiar.',
-    images: [PRODUCT_ART.limon],
+    images: [PRODUCT_PHOTOS.limon.url],
     publishedAt: '2026-08-29T07:45:00Z',
     viewsCount: 38,
     favoritesCount: 6,
@@ -450,7 +535,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.9,
     sellerReviewsCount: 22,
     description: 'Papa colorada de textura harinosa y excelente cocción para guisos y sopas. Directo de chacra sin lavado previo para mayor conservación.',
-    images: [PRODUCT_ART.papa],
+    images: [PRODUCT_PHOTOS.papa2.url],
     publishedAt: '2026-08-27T11:00:00Z',
     viewsCount: 50,
     favoritesCount: 8,
@@ -481,7 +566,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.7,
     sellerReviewsCount: 9,
     description: 'Últimas 15 bolsas de cebolla blanca dulce. Oportunidad para pequeños distribuidores o negocios de comida rápida.',
-    images: [PRODUCT_ART.cebolla],
+    images: [PRODUCT_PHOTOS.cebolla2.url],
     publishedAt: '2026-08-29T04:15:00Z',
     viewsCount: 62,
     favoritesCount: 10,
@@ -512,7 +597,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.8,
     sellerReviewsCount: 14,
     description: 'Camionada directa con naranjas jugosas de temporada. Descuento adicional si se adquiere por encima de 100 kg.',
-    images: [PRODUCT_ART.naranja],
+    images: [PRODUCT_PHOTOS.naranja2.url],
     publishedAt: '2026-08-28T09:00:00Z',
     viewsCount: 78,
     favoritesCount: 14,
@@ -522,7 +607,7 @@ const INITIAL_DEMO_LOTS = [
   },
   {
     id: 'lot-12',
-    product: 'Zapallo Tipo Butternut / Anco Dulce',
+    product: 'Zapallo Tipo Anco Dulce (Segunda Categoría)',
     category: 'cucurbitaceas',
     quantity: 120,
     unit: 'kg',
@@ -543,7 +628,7 @@ const INITIAL_DEMO_LOTS = [
     sellerRating: 4.6,
     sellerReviewsCount: 18,
     description: 'Zapallos anco con pulpa compacta y excelente dulzor. Formas ligeramente curvas pero calidad culinaria intacta.',
-    images: [PRODUCT_ART.zapallo],
+    images: [PRODUCT_PHOTOS.zapallo2.url],
     publishedAt: '2026-08-26T15:30:00Z',
     viewsCount: 22,
     favoritesCount: 3,
@@ -557,7 +642,7 @@ const DEFAULT_PROFILE = {
   id: 'user-demo-01',
   name: 'Carlos Mendoza',
   businessName: 'Distribuidora San Luis',
-  activeRole: 'buyer', // default as buyer to match demo tour
+  activeRole: 'buyer',
   sellerType: 'Mayorista / Distribuidor',
   buyerType: 'Pequeño negocio gastronómico',
   phone: '+59172981234',

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'buenaprovecho-v1';
+const CACHE_NAME = 'buenaprovecho-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

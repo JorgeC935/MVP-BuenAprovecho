@@ -30,6 +30,29 @@ const UI = {
     return found ? found.icon : '🥬';
   },
 
+  // --- Image Fallback Helper ---
+  // Returns HTML attributes + onerror for robust image rendering.
+  // Uses PRODUCT_PHOTOS for gradient/emoji fallback when photo fails.
+  getImgAttrs(src, alt) {
+    // Detect which product photo key matches this src URL
+    const photoEntry = Object.values(PRODUCT_PHOTOS).find(p => p.url === src);
+    const gradient = photoEntry
+      ? photoEntry.fallbackGradient
+      : 'linear-gradient(135deg, #d4e6d9 0%, #8db89a 100%)';
+    const emoji = photoEntry ? photoEntry.emoji : '🌿';
+    const label = photoEntry ? photoEntry.label : (alt || 'Producto');
+
+    // onerror: replace img with a styled div fallback
+    const onerror = `this.onerror=null; this.style.display='none';
+      var fb=document.createElement('div');
+      fb.className='img-fallback';
+      fb.style.background='${gradient}';
+      fb.innerHTML='<span class=\\'fallback-emoji\\'>${emoji}</span><span class=\\'fallback-label\\'>${label}</span>';
+      this.parentNode.insertBefore(fb, this.nextSibling);`.replace(/\n\s*/g, ' ');
+
+    return `src="${src}" alt="${alt || label}" loading="lazy" onerror="${onerror}"`;
+  },
+
   // --- Toast Notification System ---
   showToast(message, type = 'success', duration = 3200) {
     let container = document.getElementById('toast-container');
@@ -69,17 +92,18 @@ const UI = {
   // --- Render Lot Card (Buyer View) ---
   renderLotCard(lot, isFavorite = false, showInterestBadge = false) {
     const isQuick = lot.quickExit || lot.commercialReason === 'Salida rápida';
-    const mainImg = (lot.images && lot.images.length > 0) ? lot.images[0] : PRODUCT_ART.papa;
+    const mainImg = (lot.images && lot.images.length > 0) ? lot.images[0] : PRODUCT_PHOTOS.papa.url;
     const labSettings = Storage.getLabSettings();
+    const imgAttrs = this.getImgAttrs(mainImg, lot.product);
 
     return `
       <article class="lot-card ${lot.isFeatured ? 'card-is-featured' : ''}" data-lot-id="${lot.id}">
         <div class="lot-card-media" onclick="App.openLotDetail('${lot.id}')">
-          <img src="${mainImg}" alt="${lot.product}" loading="lazy" class="lot-card-img" />
+          <img class="lot-card-img" ${imgAttrs} />
           <div class="lot-card-badges">
             ${isQuick ? `<span class="badge badge-urgent"><span class="badge-dot"></span> Salida rápida</span>` : ''}
             ${lot.isFeatured ? `<span class="badge badge-featured">★ Destacado</span>` : ''}
-            ${showInterestBadge ? `<span class="badge badge-match">✓ Coincide con tus intereses</span>` : ''}
+            ${showInterestBadge ? `<span class="badge badge-match">✓ Para ti</span>` : ''}
           </div>
           <button class="btn-fav ${isFavorite ? 'active' : ''}" 
                   aria-label="${isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos'}"
@@ -93,37 +117,42 @@ const UI = {
         <div class="lot-card-body" onclick="App.openLotDetail('${lot.id}')">
           <div class="lot-card-header">
             <h3 class="lot-card-title">${lot.product}</h3>
-            <div class="lot-card-price">${this.formatPrice(lot.price, lot.priceModality)}</div>
+          </div>
+
+          <div class="lot-card-price-row">
+            <span class="lot-card-price">${this.formatPrice(lot.price, lot.priceModality)}</span>
+            ${lot.negotiable ? `<span class="tag-negotiable-sm">Negociable</span>` : ''}
           </div>
 
           <div class="lot-card-stock">
             <span class="stock-pill">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-              ${lot.quantity} ${lot.unit} disponibles
+              ${lot.quantity} ${lot.unit}
             </span>
             ${lot.allowPartial && lot.minPurchase ? `<span class="min-pill">Mín. ${lot.minPurchase} ${lot.unit}</span>` : ''}
           </div>
 
-          ${labSettings.showCommercialCondition && lot.commercialCondition ? `
+          ${isQuick ? `
+            <div class="lot-quick-tag">
+              <span class="tag-reason-urgent">⚡ Salida rápida</span>
+            </div>
+          ` : labSettings.showCommercialCondition && lot.commercialCondition ? `
             <div class="lot-commercial-tag">
               <span class="tag-reason">${lot.commercialReason || 'Segunda salida'}</span>
-              <span class="tag-condition">• ${lot.commercialCondition}</span>
             </div>
           ` : `
             <div class="lot-commercial-tag">
               <span class="tag-reason">${lot.commercialReason || 'Oportunidad comercial'}</span>
-              ${lot.negotiable ? `<span class="tag-negotiable">• Negociable</span>` : ''}
             </div>
           `}
 
           <div class="lot-card-footer">
             <div class="seller-info">
               <span class="seller-name">${lot.sellerName}</span>
-              <span class="seller-type">${lot.sellerType}</span>
             </div>
             <div class="location-info">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              <span>${lot.location}</span>
+              <span>${lot.location.replace('Zona ', '')}</span>
             </div>
           </div>
         </div>
@@ -134,19 +163,20 @@ const UI = {
   // --- Render Seller Lot Card (Seller Management View) ---
   renderSellerLotCard(lot) {
     const statusLabels = {
-      active: { text: 'Activo', class: 'status-active' },
-      sold: { text: 'Vendido', class: 'status-sold' },
-      retired: { text: 'Retirado', class: 'status-retired' },
+      active:   { text: 'Activo',    class: 'status-active' },
+      sold:     { text: 'Vendido',   class: 'status-sold' },
+      retired:  { text: 'Retirado',  class: 'status-retired' },
       finished: { text: 'Finalizado', class: 'status-finished' }
     };
 
     const currentStatus = statusLabels[lot.status] || statusLabels.active;
-    const mainImg = (lot.images && lot.images.length > 0) ? lot.images[0] : PRODUCT_ART.papa;
+    const mainImg = (lot.images && lot.images.length > 0) ? lot.images[0] : PRODUCT_PHOTOS.papa.url;
+    const imgAttrs = this.getImgAttrs(mainImg, lot.product);
 
     return `
       <div class="seller-lot-card ${lot.isFeatured ? 'card-is-featured' : ''}" data-lot-id="${lot.id}">
         <div class="seller-lot-media">
-          <img src="${mainImg}" alt="${lot.product}" class="seller-lot-thumb" />
+          <img class="seller-lot-thumb" ${imgAttrs} />
           <span class="status-badge ${currentStatus.class}">${currentStatus.text}</span>
           ${lot.isFeatured ? `<span class="badge badge-featured seller-feat-badge">★ Destacado</span>` : ''}
         </div>
@@ -158,12 +188,12 @@ const UI = {
               <div class="seller-lot-price">${this.formatPrice(lot.price, lot.priceModality)}</div>
             </div>
             
-            <p class="seller-lot-stock">${lot.quantity} ${lot.unit} disponibles • ${lot.location}</p>
+            <p class="seller-lot-stock">${lot.quantity} ${lot.unit} • ${lot.location}</p>
             
             <div class="seller-lot-metrics-strip">
-              <span class="metric-pill">👁️ ${lot.viewsCount || 0} vistas</span>
-              <span class="metric-pill">❤️ ${lot.favoritesCount || 0} guardados</span>
-              <span class="metric-pill pill-contacts">💬 ${Storage.getContacts().filter(c => c.lotId === lot.id).length} contactos</span>
+              <span class="metric-pill">👁️ ${lot.viewsCount || 0}</span>
+              <span class="metric-pill">❤️ ${lot.favoritesCount || 0}</span>
+              <span class="metric-pill pill-contacts">💬 ${Storage.getContacts().filter(c => c.lotId === lot.id).length}</span>
             </div>
 
             ${lot.status === 'sold' && lot.declaredSoldQuantity ? `
@@ -245,28 +275,23 @@ const UI = {
             <text x="360" y="195" fill="#3a82b3" font-size="12" font-weight="700" font-family="system-ui" transform="rotate(30 360 195)">Río Guadalquivir</text>
 
             <!-- Zone Areas -->
-            <!-- Mercado Campesino Zone -->
             <rect x="340" y="130" width="170" height="115" rx="16" fill="#1b7a43" fill-opacity="0.12" stroke="#1b7a43" stroke-width="2" stroke-dasharray="4"/>
             <text x="425" y="160" fill="#1b7a43" font-size="13" font-weight="800" text-anchor="middle" font-family="system-ui">Zona Mercado Campesino</text>
-            <text x="425" y="178" fill="#2e7d32" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui">Centro mayorista y distribución</text>
+            <text x="425" y="178" fill="#2e7d32" font-size="10" font-weight="600" text-anchor="middle" font-family="system-ui">Centro mayorista</text>
 
-            <!-- Centro & Mercado Central -->
             <rect x="280" y="265" width="140" height="90" rx="16" fill="#e06d3b" fill-opacity="0.12" stroke="#e06d3b" stroke-width="2" stroke-dasharray="4"/>
             <text x="350" y="295" fill="#c05621" font-size="12" font-weight="800" text-anchor="middle" font-family="system-ui">Mercado Central / Centro</text>
 
-            <!-- La Loma -->
             <circle cx="230" cy="220" r="45" fill="#f6ad55" fill-opacity="0.15" stroke="#dd6b20" stroke-width="1.5" stroke-dasharray="4"/>
             <text x="230" y="220" fill="#c05621" font-size="11" font-weight="700" text-anchor="middle" font-family="system-ui">La Loma</text>
 
-            <!-- Senac / Tabladita -->
             <rect x="120" y="320" width="130" height="90" rx="16" fill="#4299e1" fill-opacity="0.12" stroke="#3182ce" stroke-width="1.5" stroke-dasharray="4"/>
-            <text x="185" y="360" fill="#2b6cb0" font-size="12" font-weight="700" text-anchor="middle" font-family="system-ui">Zona Senac / Tabladita</text>
+            <text x="185" y="360" fill="#2b6cb0" font-size="12" font-weight="700" text-anchor="middle" font-family="system-ui">Senac / Tabladita</text>
 
-            <!-- San Jeronimo / El Tejar -->
             <rect x="480" y="310" width="155" height="90" rx="16" fill="#48bb78" fill-opacity="0.12" stroke="#38a169" stroke-width="1.5" stroke-dasharray="4"/>
             <text x="555" y="350" fill="#276749" font-size="12" font-weight="700" text-anchor="middle" font-family="system-ui">San Jerónimo / El Tejar</text>
 
-            <!-- Main Tarija Avenues -->
+            <!-- Main avenues -->
             <path d="M120 180 L680 180" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
             <text x="600" y="172" fill="#94a3b8" font-size="9" font-family="system-ui">Av. Circunvalación</text>
             <path d="M425 50 L425 460" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
@@ -285,7 +310,7 @@ const UI = {
                         title="${lot.product} - ${lot.priceModality} ${lot.price}"
                         onclick="App.openLotDetail('${lot.id}')">
                   <span class="pin-icon">${lot.quickExit ? '⚡' : (lot.isFeatured ? '★' : '🧺')}</span>
-                  <span class="pin-tooltip">${lot.product} · <strong>Bs ${lot.price}</strong></span>
+                  <span class="pin-tooltip">${lot.product.split('(')[0].trim()} · <strong>Bs ${lot.price}</strong></span>
                 </button>
               `;
             }).join('')}

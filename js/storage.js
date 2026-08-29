@@ -3,14 +3,14 @@
  */
 
 const STORAGE_KEYS = {
-  LOTS: 'ba_lots_v1',
-  PROFILE: 'ba_profile_v1',
-  FAVORITES: 'ba_favorites_v1',
-  CONTACTS: 'ba_contacts_v1',
-  REVIEWS: 'ba_reviews_v1',
-  REPORTS: 'ba_reports_v1',
-  LAB: 'ba_lab_v1',
-  VIEWED_LOTS: 'ba_viewed_v1'
+  LOTS:        'ba_lots_v2',
+  PROFILE:     'ba_profile_v2',
+  FAVORITES:   'ba_favorites_v2',
+  CONTACTS:    'ba_contacts_v2',
+  REVIEWS:     'ba_reviews_v2',
+  REPORTS:     'ba_reports_v2',
+  LAB:         'ba_lab_v2',
+  VIEWED_LOTS: 'ba_viewed_v2'
 };
 
 const Storage = {

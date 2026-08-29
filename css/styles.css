@@ -806,14 +806,20 @@ a {
    ========================================================================== */
 .lots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 18px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 639px) {
   .lots-grid {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .lots-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -841,8 +847,8 @@ a {
 
 .lot-card-media {
   position: relative;
-  aspect-ratio: 16 / 10;
-  background: #f1f5f9;
+  aspect-ratio: 4 / 3;
+  background: #f0f4f1;
   overflow: hidden;
   cursor: pointer;
 }
@@ -897,33 +903,93 @@ a {
 }
 
 .lot-card-body {
-  padding: 14px;
+  padding: 12px 14px 14px;
   display: flex;
   flex-direction: column;
   flex: 1;
   cursor: pointer;
 }
 
-.lot-card-header {
+/* Image fallback — shown via onerror when external photo fails */
+.img-fallback {
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-bottom: 8px;
+}
+
+.fallback-emoji {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.fallback-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Ensure fallback fills the media container properly */
+.lot-card-media .img-fallback,
+.seller-lot-media .img-fallback,
+.main-image-wrap .img-fallback {
+  position: absolute;
+  inset: 0;
+}
+
+.lot-card-header {
+  margin-bottom: 6px;
 }
 
 .lot-card-title {
-  font-size: 1rem;
+  font-size: 0.97rem;
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-main);
 }
 
+.lot-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .lot-card-price {
-  font-size: 1.12rem;
+  font-size: 1.18rem;
   font-weight: 800;
   color: var(--primary-text);
-  white-space: nowrap;
+}
+
+.tag-negotiable-sm {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #0d9488;
+  background: #ccfbf1;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.lot-quick-tag {
+  margin-bottom: 10px;
+}
+
+.tag-reason-urgent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid #fecaca;
 }
 
 .unit-badge {
@@ -2177,8 +2243,8 @@ a {
 
 .main-image-wrap {
   position: relative;
-  aspect-ratio: 16 / 10;
-  background: #f1f5f9;
+  aspect-ratio: 4 / 3;
+  background: #f0f4f1;
   border-radius: var(--radius-md);
   overflow: hidden;
 }
