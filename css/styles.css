@@ -105,6 +105,7 @@ button {
   cursor: pointer;
   border: none;
   background: none;
+  touch-action: manipulation;
 }
 
 a {
@@ -139,7 +140,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
 }
 
 .brand-logo {
@@ -147,10 +148,11 @@ a {
   align-items: center;
   gap: 10px;
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   color: var(--primary-text);
   letter-spacing: -0.02em;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .logo-symbol {
@@ -185,7 +187,7 @@ a {
 }
 
 .brand-tagline {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0;
@@ -200,12 +202,12 @@ a {
   .desktop-nav {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   .nav-link {
-    padding: 8px 14px;
-    font-size: 0.92rem;
+    padding: 8px 12px;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-muted);
     border-radius: var(--radius-full);
@@ -226,19 +228,56 @@ a {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+}
+
+.btn-header-alerts {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: var(--transition-fast);
+}
+
+.btn-header-alerts:hover {
+  background: #e2e8f0;
+}
+
+.alerts-count-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--accent);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid white;
 }
 
 .role-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-fast);
+  white-space: nowrap;
 }
 
 .role-badge.role-seller {
@@ -333,7 +372,7 @@ a {
 
 .app-view {
   display: none;
-  animation: fadeIn 0.25s ease forwards;
+  animation: fadeIn 0.22s ease forwards;
 }
 
 .app-view.active {
@@ -341,7 +380,7 @@ a {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -396,6 +435,13 @@ a {
 .btn-outline:hover {
   background-color: var(--bg-surface-subtle);
   border-color: #cbd5e1;
+}
+
+.btn-featured-active {
+  background: var(--warning-light);
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-weight: 700;
 }
 
 .btn-danger-outline {
@@ -515,14 +561,14 @@ a {
 }
 
 /* ==========================================================================
-   Home View Styles
+   Home View Styles & Simulated Alerts Bar
    ========================================================================== */
 .home-hero {
   background: linear-gradient(135deg, #1b7a43 0%, #155d34 100%);
   color: white;
   border-radius: var(--radius-lg);
   padding: 28px 20px;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
@@ -530,7 +576,7 @@ a {
 
 @media (min-width: 769px) {
   .home-hero {
-    padding: 42px 36px;
+    padding: 40px 36px;
   }
 }
 
@@ -551,9 +597,9 @@ a {
   background: rgba(255, 255, 255, 0.16);
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -568,7 +614,7 @@ a {
 
 @media (min-width: 769px) {
   .hero-title {
-    font-size: 2.3rem;
+    font-size: 2.25rem;
   }
 }
 
@@ -581,7 +627,7 @@ a {
   line-height: 1.4;
   opacity: 0.92;
   max-width: 580px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .search-bar-wrap {
@@ -628,16 +674,55 @@ a {
   color: var(--text-muted);
 }
 
+/* Home News & Alerts Banner */
+.home-alerts-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+
+.home-alerts-bar:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.alert-pulse-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.alert-bar-text {
+  flex: 1;
+  font-size: 0.84rem;
+  color: #14532d;
+  line-height: 1.35;
+}
+
+.alert-bar-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
 /* Category Pills Horizontal Scroll */
 .section-categories {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .categories-scroll {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding: 4px 2px 10px 2px;
+  padding: 4px 2px 8px 2px;
   scrollbar-width: thin;
 }
 
@@ -685,7 +770,7 @@ a {
 
 /* Sections */
 .home-section {
-  margin-bottom: 32px;
+  margin-bottom: 30px;
 }
 
 .section-header {
@@ -749,6 +834,11 @@ a {
   border-color: #cbd5e1;
 }
 
+.lot-card.card-is-featured {
+  border-top: 3px solid #f59e0b;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12);
+}
+
 .lot-card-media {
   position: relative;
   aspect-ratio: 16 / 10;
@@ -807,7 +897,7 @@ a {
 }
 
 .lot-card-body {
-  padding: 14px 14px 16px 14px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -1017,7 +1107,7 @@ a {
 
 .form-select, .form-input, .form-textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: 9px 12px;
   border-radius: var(--radius-xs);
   border: 1px solid var(--border-subtle);
   background: var(--bg-surface);
@@ -1064,7 +1154,7 @@ a {
 }
 
 /* ==========================================================================
-   Seller Management & Publishing View
+   Seller Management & Fast Publishing View
    ========================================================================== */
 .seller-management-header {
   display: flex;
@@ -1117,9 +1207,14 @@ a {
   display: flex;
   gap: 16px;
   box-shadow: var(--shadow-xs);
+  transition: var(--transition-fast);
 }
 
-@media (max-width: 600px) {
+.seller-lot-card.card-is-featured {
+  border-left: 4px solid #f59e0b;
+}
+
+@media (max-width: 640px) {
   .seller-lot-card {
     flex-direction: column;
   }
@@ -1134,7 +1229,7 @@ a {
   overflow: hidden;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .seller-lot-media {
     width: 100%;
     height: 140px;
@@ -1145,6 +1240,12 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.seller-feat-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
 }
 
 .status-badge {
@@ -1181,6 +1282,13 @@ a {
   gap: 10px;
 }
 
+.seller-lot-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 .seller-lot-title {
   font-size: 1.05rem;
   font-weight: 700;
@@ -1191,7 +1299,7 @@ a {
   font-size: 1.1rem;
   font-weight: 800;
   color: var(--primary-text);
-  margin-top: 2px;
+  white-space: nowrap;
 }
 
 .seller-lot-stock {
@@ -1199,17 +1307,36 @@ a {
   color: var(--text-muted);
 }
 
-.seller-lot-meta {
+.seller-lot-metrics-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.metric-pill {
   font-size: 0.74rem;
-  color: var(--text-subtle);
-  margin-top: 4px;
+  font-weight: 600;
+  background: var(--bg-surface-subtle);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+}
+
+.metric-pill.pill-contacts {
+  background: var(--primary-light);
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
 .declared-sold-note {
   font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-top: 4px;
+  color: var(--primary-text);
+  background: var(--primary-light);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  margin-top: 6px;
+  display: inline-block;
 }
 
 .seller-lot-actions {
@@ -1218,6 +1345,61 @@ a {
   gap: 8px;
   padding-top: 8px;
   border-top: 1px solid #f1f5f9;
+}
+
+/* Quick Fill Presets Box */
+.quick-presets-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.quick-presets-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: #14532d;
+  margin-bottom: 10px;
+}
+
+.flash-icon {
+  font-size: 1.3rem;
+}
+
+.presets-sub {
+  font-size: 0.78rem;
+  color: #166534;
+  margin-top: 2px;
+}
+
+.presets-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+}
+
+.preset-pill-btn {
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #14532d;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+  transition: var(--transition-fast);
+}
+
+.preset-pill-btn:hover {
+  background: #1b7a43;
+  color: white;
+  border-color: #1b7a43;
 }
 
 /* Publishing Form */
@@ -1236,8 +1418,8 @@ a {
 }
 
 .form-section {
-  padding-bottom: 24px;
-  margin-bottom: 24px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -1245,7 +1427,7 @@ a {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-main);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1420,7 +1602,7 @@ a {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .stat-card, .metric-card {
@@ -1473,6 +1655,66 @@ a {
   margin-top: 4px;
 }
 
+/* Volume Sold Breakdown */
+.sold-breakdown-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-xs);
+}
+
+.breakdown-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.breakdown-pills-wrap {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.breakdown-pill {
+  background: var(--bg-surface-subtle);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  color: var(--text-main);
+}
+
+/* Performance Table */
+.ranking-table-wrap {
+  overflow-x: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.ranking-table th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+}
+
+.ranking-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.highlight-contacts {
+  color: var(--primary);
+  font-weight: 800;
+}
+
 .activity-section {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
@@ -1484,7 +1726,7 @@ a {
 .activity-sub-title {
   font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
 }
 
 .contacts-list {
@@ -1803,6 +2045,10 @@ a {
   animation: pulsePin 1.8s infinite;
 }
 
+.map-pin-btn.pin-featured {
+  background: #f59e0b;
+}
+
 @keyframes pulsePin {
   0% { box-shadow: 0 0 0 0 rgba(224, 109, 59, 0.6); }
   70% { box-shadow: 0 0 0 10px rgba(224, 109, 59, 0); }
@@ -1872,7 +2118,7 @@ a {
   overflow-y: auto;
   box-shadow: var(--shadow-modal);
   position: relative;
-  animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: modalEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .modal-window-sm {
@@ -2097,10 +2343,14 @@ a {
 }
 
 .platform-disclaimer {
-  font-size: 0.72rem;
-  color: var(--text-subtle);
-  line-height: 1.3;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.35;
   margin: 14px 0;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  border-left: 3px solid #cbd5e1;
 }
 
 .detail-actions-footer {
@@ -2137,7 +2387,7 @@ a {
 }
 
 /* Interest WhatsApp Flow */
-.interest-flow, .sold-flow, .report-flow, .featured-flow {
+.interest-flow, .sold-flow, .report-flow, .featured-flow, .alerts-center-flow {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -2190,6 +2440,69 @@ a {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 16px;
+}
+
+/* Alerts Center Modal */
+.alerts-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-card-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-app);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.alert-card-item:hover {
+  background: var(--primary-light);
+  border-color: rgba(27, 122, 67, 0.3);
+}
+
+.alert-item-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.alert-item-body {
+  flex: 1;
+}
+
+.alert-item-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.alert-item-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.alert-item-time {
+  font-size: 0.7rem;
+  color: var(--text-subtle);
+  margin-top: 3px;
+}
+
+.alert-item-arrow {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.alerts-footer-note {
+  font-size: 0.74rem;
+  color: var(--text-subtle);
+  text-align: center;
+  margin-top: 12px;
 }
 
 /* Sold Demo Modal */
@@ -2281,7 +2594,7 @@ a {
    ========================================================================== */
 .empty-state {
   text-align: center;
-  padding: 48px 20px;
+  padding: 44px 20px;
   background: var(--bg-surface);
   border-radius: var(--radius-md);
   border: 1px dashed var(--border-subtle);
@@ -2393,4 +2706,3 @@ a {
     scroll-behavior: auto !important;
   }
 }
-

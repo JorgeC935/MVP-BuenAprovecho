@@ -78,6 +78,106 @@ const PRODUCT_ART = {
   limon: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%"><rect width="400" height="300" fill="%23f6fae8"/><circle cx="200" cy="150" r="110" fill="%2398cc2e" opacity="0.2"/><path d="M125 155 C120 100, 260 100, 265 155 C260 210, 120 210, 125 155 Z" transform="rotate(-15 195 155)" fill="%2385c219"/><circle cx="190" cy="150" r="45" fill="%23a2db37" opacity="0.7"/><path d="M265 135 L275 132 M125 175 L115 178" stroke="%23689c10" stroke-width="4" stroke-linecap="round"/><text x="20" y="40" font-family="system-ui, sans-serif" font-size="14" font-weight="bold" fill="%23689c10" opacity="0.6">Limón Sutil / Criollo</text></svg>`
 };
 
+// Quick-fill presets for ultra-fast seller publishing (1-tap setup)
+const QUICK_PUBLISH_PRESETS = [
+  {
+    key: 'papa',
+    label: '🥔 Papa Holandesa',
+    product: 'Papa Holandesa de Valle',
+    category: 'tuberculos',
+    quantity: 100,
+    unit: 'kg',
+    price: 3.5,
+    priceModality: 'Bs/kg',
+    allowPartial: true,
+    minPurchase: 15,
+    commercialReason: 'Salida rápida',
+    commercialCondition: 'Tamaño / calibre mixto',
+    imageKey: 'papa',
+    description: 'Papa fresca de valle con excelente punto de cocción, calibre variado ideal para gastronomía o consumo diario.'
+  },
+  {
+    key: 'cebolla',
+    label: '🧅 Cebolla Roja en Bolsa',
+    product: 'Cebolla Roja Seleccionada',
+    category: 'hortalizas',
+    quantity: 30,
+    unit: 'bolsa',
+    price: 38,
+    priceModality: 'Bs/bolsa',
+    allowPartial: true,
+    minPurchase: 2,
+    commercialReason: 'Sobreoferta',
+    commercialCondition: 'Excedente de cosecha fresca',
+    imageKey: 'cebolla',
+    description: 'Cebolla roja bien seca y firme, cosechada recientemente. Lista para retiro en sector mayorista.'
+  },
+  {
+    key: 'zanahoria',
+    label: '🥕 Zanahoria de Campo',
+    product: 'Zanahoria de Campo Dulce',
+    category: 'hortalizas',
+    quantity: 150,
+    unit: 'kg',
+    price: 2.8,
+    priceModality: 'Bs/kg',
+    allowPartial: true,
+    minPurchase: 10,
+    commercialReason: 'Segunda categoría',
+    commercialCondition: 'Apariencia irregular (forma no estándar)',
+    imageKey: 'zanahoria',
+    description: 'Zanahorias dulces y crujientes con formas curvas. Ideales para jugos, rallados y cocina general.'
+  },
+  {
+    key: 'naranja',
+    label: '🍊 Naranja Bermejo',
+    product: 'Naranja Dulce Bermejeña',
+    category: 'citricos',
+    quantity: 20,
+    unit: 'caja',
+    price: 45,
+    priceModality: 'Bs/caja',
+    allowPartial: true,
+    minPurchase: 2,
+    commercialReason: 'Salida rápida',
+    commercialCondition: 'Maduración avanzada para consumo pronto',
+    imageKey: 'naranja',
+    description: 'Naranjas de gran dulzura y abundante jugo. Se busca salida ágil para aprovechar su frescura.'
+  },
+  {
+    key: 'zapallo',
+    label: '🎃 Zapallo Criollo',
+    product: 'Zapallo Criollo Plomo',
+    category: 'cucurbitaceas',
+    quantity: 200,
+    unit: 'kg',
+    price: 2.2,
+    priceModality: 'Bs/kg',
+    allowPartial: true,
+    minPurchase: 10,
+    commercialReason: 'Baja rotación',
+    commercialCondition: 'Sobrestock de temporada',
+    imageKey: 'zapallo',
+    description: 'Zapallo criollo con pulpa cremosa y rendidora. Precio conveniente por cantidad.'
+  },
+  {
+    key: 'limon',
+    label: '🍋 Limón Criollo',
+    product: 'Limón Criollo Jugoso',
+    category: 'citricos',
+    quantity: 60,
+    unit: 'kg',
+    price: 4.0,
+    priceModality: 'Bs/kg',
+    allowPartial: true,
+    minPurchase: 5,
+    commercialReason: 'Salida rápida',
+    commercialCondition: 'Apariencia irregular (forma no estándar)',
+    imageKey: 'limon',
+    description: 'Limón sutil con alto contenido de jugo, tamaño mediano. Ideal para pensiones y negocios gastronómicos.'
+  }
+];
+
 const INITIAL_DEMO_LOTS = [
   {
     id: 'lot-01',
@@ -104,11 +204,11 @@ const INITIAL_DEMO_LOTS = [
     description: 'Lote de papa seleccionada de segunda categoría, ideal para restaurantes, pollerías o consumo familiar. Excelente sabor y consistencia, solo calibre no estándar.',
     images: [PRODUCT_ART.papa],
     publishedAt: '2026-08-29T06:30:00Z',
-    viewsCount: 42,
-    favoritesCount: 8,
+    viewsCount: 48,
+    favoritesCount: 9,
     status: 'active',
     isFeatured: true,
-    coordinates: { x: 48, y: 38 } // relative % for Tarija simulated map
+    coordinates: { x: 48, y: 38 }
   },
   {
     id: 'lot-02',
@@ -189,16 +289,16 @@ const INITIAL_DEMO_LOTS = [
     location: 'Zona La Loma',
     locationRef: 'Calle Cochabamba cerca al mirador, depósito 12',
     pickupSchedule: '09:00 a 19:00',
-    sellerName: 'Comercial La Huerta',
+    sellerName: 'Distribuidora San Luis',
     sellerType: 'Mayorista / Distribuidor',
-    sellerPhone: '+59176123984',
-    sellerRating: 4.6,
+    sellerPhone: '+59172981234',
+    sellerRating: 4.8,
     sellerReviewsCount: 18,
     description: 'Naranjas muy jugosas en punto óptimo de dulzura. Cáscara con detalles de sol pero pulpa de primera calidad. Se busca salida en 48 hrs.',
     images: [PRODUCT_ART.naranja],
     publishedAt: '2026-08-29T05:40:00Z',
-    viewsCount: 54,
-    favoritesCount: 9,
+    viewsCount: 59,
+    favoritesCount: 11,
     status: 'active',
     isFeatured: true,
     coordinates: { x: 35, y: 48 }
@@ -417,7 +517,7 @@ const INITIAL_DEMO_LOTS = [
     viewsCount: 78,
     favoritesCount: 14,
     status: 'active',
-    isFeatured: true,
+    isFeatured: false,
     coordinates: { x: 58, y: 62 }
   },
   {
@@ -457,14 +557,16 @@ const DEFAULT_PROFILE = {
   id: 'user-demo-01',
   name: 'Carlos Mendoza',
   businessName: 'Distribuidora San Luis',
-  activeRole: 'seller', // 'buyer' or 'seller'
+  activeRole: 'buyer', // default as buyer to match demo tour
   sellerType: 'Mayorista / Distribuidor',
   buyerType: 'Pequeño negocio gastronómico',
   phone: '+59172981234',
   zone: 'Zona Mercado Campesino',
   locationRef: 'Av. Froilán Tejerina, tinglado verde puesto 44',
+  habitualSchedule: '07:00 a 14:00 (Lunes a Sábado)',
   avatar: '👨‍🌾',
-  interests: ['Papa', 'Cebolla', 'Naranja', 'Limón']
+  interests: ['Papa', 'Cebolla', 'Naranja', 'Limón'],
+  preferredZone: 'Zona Mercado Campesino'
 };
 
 const DEFAULT_LAB_SETTINGS = {
@@ -484,4 +586,3 @@ const PRODUCT_INTEREST_OPTIONS = [
   'Mandarina',
   'Limón'
 ];
-

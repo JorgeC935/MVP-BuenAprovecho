@@ -26,6 +26,7 @@ const App = {
     this.updateUserModeUI();
     this.navigate('inicio');
     this.registerServiceWorker();
+    this.updateAlertsBadge();
   },
 
   registerServiceWorker() {
@@ -67,6 +68,7 @@ const App = {
 
     // Render corresponding view data
     this.renderCurrentView();
+    this.updateAlertsBadge();
   },
 
   renderCurrentView() {
@@ -145,6 +147,15 @@ const App = {
     });
   },
 
+  updateAlertsBadge() {
+    const alerts = Storage.getSimulatedAlerts();
+    const badge = document.getElementById('alerts-count-badge');
+    if (badge) {
+      badge.textContent = alerts.length;
+      badge.style.display = alerts.length > 0 ? 'inline-flex' : 'none';
+    }
+  },
+
   // --- View: Home (Inicio) ---
   renderHomeView() {
     const container = document.getElementById('view-inicio');
@@ -154,6 +165,7 @@ const App = {
     const profile = Storage.getProfile();
     const labSettings = Storage.getLabSettings();
     const favorites = Storage.getFavorites();
+    const alerts = Storage.getSimulatedAlerts();
 
     // Urgent / Quick Exit Lots
     const urgentLots = lots.filter(l => l.quickExit || l.commercialReason === 'Salida rápida').slice(0, 4);
@@ -178,19 +190,31 @@ const App = {
     `).join('');
 
     container.innerHTML = `
+      <!-- Hero Banner -->
       <section class="home-hero">
         <div class="hero-content">
           <div class="hero-top-tag">Marketplace Agrícola · Tarija</div>
           <h1 class="hero-title">Aprovecha más.<br><span class="highlight">Desperdicia menos.</span></h1>
-          <p class="hero-subtitle">Conectamos lotes agrícolas con segunda salida comercial directa entre productores, distribuidores y compradores.</p>
+          <p class="hero-subtitle">Segunda salida comercial directa a lotes agrícolas en Tarija. Conectamos sobreoferta y baja rotación con compradores inmediatos.</p>
           
           <div class="search-bar-wrap">
-            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="home-search-input" placeholder="Buscar papa, cebolla, limón, zapallo..." onkeypress="if(event.key==='Enter') App.handleHomeSearch()" />
+            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="home-search-input" placeholder="Buscar papa, cebolla, naranja, limón, zapallo..." onkeypress="if(event.key==='Enter') App.handleHomeSearch()" />
             <button class="btn btn-primary btn-search" onclick="App.handleHomeSearch()">Buscar</button>
           </div>
         </div>
       </section>
+
+      <!-- Simulated News Banner / Alertas Destacadas -->
+      ${alerts.length > 0 ? `
+        <div class="home-alerts-bar" onclick="App.openAlertsModal()">
+          <div class="alert-pulse-icon">🔔</div>
+          <div class="alert-bar-text">
+            <strong>${alerts[0].title}:</strong> ${alerts[0].desc}
+          </div>
+          <span class="alert-bar-link">Ver avisos (${alerts.length}) &rarr;</span>
+        </div>
+      ` : ''}
 
       <!-- Category Filter Pills -->
       <section class="section-categories">
@@ -205,7 +229,7 @@ const App = {
           <div class="section-header">
             <div>
               <h2 class="section-title"><span class="urgent-bolt">⚡</span> Salida Rápida</h2>
-              <p class="section-desc">Lotes con necesidad de salida prioritaria a precios convenientes</p>
+              <p class="section-desc">Lotes con necesidad de salida prioritaria a precios convenientes en Tarija</p>
             </div>
             <button class="btn-link" onclick="App.filterQuickExitAndExplore()">Ver todos &rarr;</button>
           </div>
@@ -221,7 +245,7 @@ const App = {
           <div class="section-header">
             <div>
               <h2 class="section-title">✨ Para ti</h2>
-              <p class="section-desc">Seleccionado según tus intereses (${userInterests.join(', ') || 'personalizados'})</p>
+              <p class="section-desc">Seleccionado según tus intereses guardados (${userInterests.join(', ') || 'personalizados'})</p>
             </div>
             <button class="btn-link" onclick="App.navigate('perfil')">Configurar intereses</button>
           </div>
@@ -236,9 +260,9 @@ const App = {
         <div class="section-header">
           <div>
             <h2 class="section-title">📍 Cerca de ti en Tarija</h2>
-            <p class="section-desc">Lotes disponibles en zonas céntricas y de acopio</p>
+            <p class="section-desc">Lotes disponibles en zonas céntricas y centros de acopio</p>
           </div>
-          <button class="btn-link" onclick="App.navigate('explorar')">Explorar mapa</button>
+          <button class="btn-link" onclick="App.navigate('explorar')">Explorar catálogo &rarr;</button>
         </div>
         <div class="lots-grid">
           ${nearLots.map(l => UI.renderLotCard(l, favorites.includes(l.id), false)).join('')}
@@ -250,8 +274,8 @@ const App = {
         <section class="home-section">
           <div class="section-header">
             <div>
-              <h2 class="section-title">🗺️ Mapa de Abastecimiento</h2>
-              <p class="section-desc">Ubicaciones orientativas de recojo en Tarija</p>
+              <h2 class="section-title">🗺️ Mapa de Abastecimiento en Tarija</h2>
+              <p class="section-desc">Ubicaciones orientativas de recojo en centros de abasto</p>
             </div>
           </div>
           ${UI.renderSimulatedMap(lots)}
@@ -328,17 +352,21 @@ const App = {
       return true;
     });
 
-    // Sorting
-    if (this.filters.sortBy === 'price-asc') {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (this.filters.sortBy === 'price-desc') {
-      filtered.sort((a, b) => b.price - a.price);
-    } else if (this.filters.sortBy === 'qty-desc') {
-      filtered.sort((a, b) => b.quantity - a.quantity);
-    } else {
-      // Default: recent
-      filtered.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
-    }
+    // Sorting: Featured first, then chosen criteria
+    filtered.sort((a, b) => {
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+
+      if (this.filters.sortBy === 'price-asc') {
+        return a.price - b.price;
+      } else if (this.filters.sortBy === 'price-desc') {
+        return b.price - a.price;
+      } else if (this.filters.sortBy === 'qty-desc') {
+        return b.quantity - a.quantity;
+      } else {
+        return new Date(b.publishedAt) - new Date(a.publishedAt);
+      }
+    });
 
     const zonesOptions = ['all', ...TARIJA_ZONES].map(z => `
       <option value="${z}" ${this.filters.zone === z ? 'selected' : ''}>${z === 'all' ? 'Todas las zonas de Tarija' : z}</option>
@@ -362,7 +390,7 @@ const App = {
 
         <!-- Search Bar -->
         <div class="search-bar-wrap">
-          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" id="explore-search-input" value="${this.filters.query}" placeholder="Buscar por producto, vendedor o zona..." oninput="App.handleFilterQueryChange(this.value)" />
           ${this.filters.query ? `<button class="search-clear-btn" onclick="App.clearSearchQuery()">&times;</button>` : ''}
         </div>
@@ -372,7 +400,7 @@ const App = {
           ${categoriesButtons}
         </div>
 
-        <!-- Filter Bar Accordion / Drawer -->
+        <!-- Filter Card -->
         <div class="filters-card">
           <div class="filters-grid">
             <div class="filter-group">
@@ -408,7 +436,7 @@ const App = {
           </div>
 
           <div class="filter-actions">
-            <span class="results-count">${filtered.length} lote${filtered.length === 1 ? '' : 's'} encontrado${filtered.length === 1 ? '' : 's'}</span>
+            <span class="results-count">${filtered.length} lote${filtered.length === 1 ? '' : 's'} disponible${filtered.length === 1 ? '' : 's'}</span>
             <button class="btn-text-danger" onclick="App.clearAllFilters()">Limpiar filtros</button>
           </div>
         </div>
@@ -493,7 +521,7 @@ const App = {
     container.innerHTML = `
       <div class="view-header">
         <h1 class="page-title">Lotes Guardados</h1>
-        <p class="page-subtitle">Publicaciones que has marcado para seguimiento</p>
+        <p class="page-subtitle">Publicaciones que has marcado para seguimiento rápido</p>
       </div>
 
       <div class="saved-content">
@@ -626,12 +654,26 @@ const App = {
 
     const stats = Storage.getSellerStats();
 
+    // Volume breakdown html
+    const soldBreakdownEntries = Object.entries(stats.soldByProduct || {});
+    const soldBreakdownHtml = soldBreakdownEntries.length > 0 ? `
+      <div class="sold-breakdown-card">
+        <h3 class="breakdown-title">📦 Productos Comercializados (Autodeclarado)</h3>
+        <div class="breakdown-pills-wrap">
+          ${soldBreakdownEntries.map(([prod, qty]) => `
+            <span class="breakdown-pill"><strong>${prod}:</strong> ${qty} kg/uds</span>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
     container.innerHTML = `
       <div class="view-header">
         <h1 class="page-title">Tu Actividad de Vendedor</h1>
-        <p class="page-subtitle">Rendimiento comercial y métricas locales de tus publicaciones</p>
+        <p class="page-subtitle">Rendimiento comercial y métricas locales de tus publicaciones en Tarija</p>
       </div>
 
+      <!-- Top Summary Metrics -->
       <div class="seller-metrics-grid">
         <div class="metric-card metric-primary">
           <div class="metric-icon">📦</div>
@@ -654,7 +696,7 @@ const App = {
         <div class="metric-card">
           <div class="metric-icon">⚖️</div>
           <div class="metric-value">${stats.totalSoldDeclared} <span class="metric-unit">kg/uds</span></div>
-          <div class="metric-label">Volumen Vendido Declarado</div>
+          <div class="metric-label">Volumen Total Declarado</div>
         </div>
 
         <div class="metric-card">
@@ -670,6 +712,46 @@ const App = {
         </div>
       </div>
 
+      ${soldBreakdownHtml}
+
+      <!-- Performance Leaderboard: What works best -->
+      <div class="activity-section" style="margin-bottom: 24px;">
+        <h2 class="activity-sub-title">🏆 ¿Qué publicaciones funcionan mejor?</h2>
+        <p class="section-desc" style="margin-bottom: 14px;">Ranking de tus lotes por volumen de contactos y vistas recibidas</p>
+        
+        ${stats.rankedLots.length > 0 ? `
+          <div class="ranking-table-wrap">
+            <table class="ranking-table">
+              <thead>
+                <tr>
+                  <th>Lote</th>
+                  <th>Estado</th>
+                  <th>Vistas</th>
+                  <th>Favoritos</th>
+                  <th>Contactos</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${stats.rankedLots.map(l => `
+                  <tr>
+                    <td><strong>${l.product}</strong></td>
+                    <td><span class="status-badge ${l.status === 'active' ? 'status-active' : 'status-sold'}">${l.status === 'active' ? 'Activo' : 'Vendido'}</span></td>
+                    <td>👁️ ${l.viewsCount || 0}</td>
+                    <td>❤️ ${l.favoritesCount || 0}</td>
+                    <td><strong class="highlight-contacts">💬 ${l.contactsCount}</strong></td>
+                    <td>
+                      <button class="btn btn-sm btn-secondary" onclick="App.openLotDetail('${l.id}')">Ver</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : `<p class="empty-text">Aún no hay publicaciones suficientes para comparar rendimiento.</p>`}
+      </div>
+
+      <!-- Recent Buyer Inquiries -->
       <div class="activity-section">
         <h2 class="activity-sub-title">Intereses y Contactos Recientes de Compradores</h2>
         ${stats.recentContacts.length > 0 ? `
@@ -697,28 +779,30 @@ const App = {
     `;
   },
 
-  // --- View: Publish / Edit Lot (Publicar un Lote) ---
+  // --- View: Publish / Edit Lot (Ultra-Fast Form) ---
   renderPublishView(editLotId = null) {
     const container = document.getElementById('view-publicar');
     if (!container) return;
 
     this.currentEditingLotId = editLotId;
+    const defaults = Storage.getLastPublishDefaults();
+
     let lotData = {
       product: '',
       category: 'tuberculos',
       quantity: '',
-      unit: 'kg',
+      unit: defaults.unit || 'kg',
       price: '',
-      priceModality: 'Bs/kg',
+      priceModality: defaults.priceModality || 'Bs/kg',
       allowPartial: false,
       minPurchase: '',
       negotiable: false,
-      quickExit: false,
+      quickExit: true,
       commercialReason: 'Salida rápida',
       commercialCondition: 'Tamaño / calibre mixto',
-      location: 'Zona Mercado Campesino',
-      locationRef: '',
-      pickupSchedule: '07:00 a 14:00',
+      location: defaults.location || 'Zona Mercado Campesino',
+      locationRef: defaults.locationRef || '',
+      pickupSchedule: defaults.pickupSchedule || '07:00 a 14:00 (Lunes a Sábado)',
       description: '',
       images: []
     };
@@ -730,7 +814,7 @@ const App = {
         this.publishedImages = existing.images || [];
       }
     } else {
-      this.publishedImages = [PRODUCT_ART.papa]; // Default starter artwork
+      this.publishedImages = [PRODUCT_ART.papa];
     }
 
     const zonesOptions = TARIJA_ZONES.map(z => `
@@ -753,11 +837,34 @@ const App = {
       <option value="${c}" ${lotData.commercialCondition === c ? 'selected' : ''}>${c}</option>
     `).join('');
 
+    // Quick presets buttons for 1-tap fill
+    const presetsButtonsHtml = QUICK_PUBLISH_PRESETS.map(p => `
+      <button type="button" class="preset-pill-btn" onclick="App.applyQuickPreset('${p.key}')">
+        ${p.label}
+      </button>
+    `).join('');
+
     container.innerHTML = `
       <div class="publish-header">
         <h1 class="page-title">${editLotId ? 'Editar Lote Agrícola' : 'Publicar Lote Agrícola'}</h1>
-        <p class="page-subtitle">Completa los datos en menos de 1 minuto para ofertar en Tarija</p>
+        <p class="page-subtitle">Publicación ágil con guardado automático de tu ubicación y horario habitual en Tarija</p>
       </div>
+
+      <!-- 1-Tap Quick Setup Presets -->
+      ${!editLotId ? `
+        <div class="quick-presets-box">
+          <div class="quick-presets-header">
+            <span class="flash-icon">⚡</span>
+            <div>
+              <strong>Llenado en 1 toque (Plantillas frecuentes):</strong>
+              <div class="presets-sub">Toca cualquier producto para autocompletar precio, fotos y detalles:</div>
+            </div>
+          </div>
+          <div class="presets-scroll">
+            ${presetsButtonsHtml}
+          </div>
+        </div>
+      ` : ''}
 
       <form id="publish-form" class="publish-form" onsubmit="App.handlePublishSubmit(event)">
         <!-- Step 1: Producto y Fotos -->
@@ -782,7 +889,7 @@ const App = {
 
           <div class="form-group">
             <label class="form-label">Fotografías del lote (1 a 3 fotos) <span class="required">*</span></label>
-            <p class="form-help">Selecciona fotos de tu dispositivo o usa ilustraciones optimizadas.</p>
+            <p class="form-help">Selecciona fotos de tu dispositivo o usa las ilustraciones optimizadas.</p>
             
             <div class="photo-uploader">
               <input type="file" id="pub-file-input" accept="image/*" multiple style="display:none" onchange="App.handleImageUpload(event)" />
@@ -903,7 +1010,7 @@ const App = {
             <select id="pub-condition" class="form-select">
               ${conditionsOptions}
             </select>
-            <p class="form-help">Nota: BuenAprovecho facilita la conexión comercial; el vendedor es responsable de la descripción clara del lote.</p>
+            <p class="form-help">Nota: BuenAprovecho facilita el contacto entre las partes. La información y condición declarada del producto es responsabilidad del vendedor.</p>
           </div>
 
           <div class="form-group">
@@ -922,6 +1029,47 @@ const App = {
         </div>
       </form>
     `;
+  },
+
+  applyQuickPreset(presetKey) {
+    const preset = QUICK_PUBLISH_PRESETS.find(p => p.key === presetKey);
+    if (!preset) return;
+
+    const prodInput = document.getElementById('pub-product');
+    const catSelect = document.getElementById('pub-category');
+    const qtyInput = document.getElementById('pub-quantity');
+    const unitSelect = document.getElementById('pub-unit');
+    const priceInput = document.getElementById('pub-price');
+    const modSelect = document.getElementById('pub-modality');
+    const allowPartialCheck = document.getElementById('pub-allow-partial');
+    const minPurchaseInput = document.getElementById('pub-min-purchase');
+    const reasonSelect = document.getElementById('pub-reason');
+    const condSelect = document.getElementById('pub-condition');
+    const descText = document.getElementById('pub-desc');
+
+    if (prodInput) prodInput.value = preset.product;
+    if (catSelect) catSelect.value = preset.category;
+    if (qtyInput) qtyInput.value = preset.quantity;
+    if (unitSelect) unitSelect.value = preset.unit;
+    if (priceInput) priceInput.value = preset.price;
+    if (modSelect) modSelect.value = preset.priceModality;
+    if (allowPartialCheck) {
+      allowPartialCheck.checked = preset.allowPartial;
+      this.togglePartialSaleUI(preset.allowPartial);
+    }
+    if (minPurchaseInput && preset.minPurchase) minPurchaseInput.value = preset.minPurchase;
+    if (reasonSelect) reasonSelect.value = preset.commercialReason;
+    if (condSelect) condSelect.value = preset.commercialCondition;
+    if (descText) descText.value = preset.description;
+
+    // Apply preset artwork
+    if (preset.imageKey && PRODUCT_ART[preset.imageKey]) {
+      this.publishedImages = [PRODUCT_ART[preset.imageKey]];
+      const preview = document.getElementById('photos-preview-container');
+      if (preview) preview.innerHTML = this.renderPhotosPreviewHtml();
+    }
+
+    UI.showToast(`Plantilla de ${preset.label} aplicada con éxito`, 'success', 2500);
   },
 
   renderPhotosPreviewHtml() {
@@ -1100,7 +1248,7 @@ const App = {
     container.innerHTML = `
       <div class="view-header">
         <h1 class="page-title">Perfil y Configuración</h1>
-        <p class="page-subtitle">Gestiona tu identidad simulada, intereses y modo de uso</p>
+        <p class="page-subtitle">Gestiona tu identidad simulada, intereses y modo de uso en Tarija</p>
       </div>
 
       <!-- Mode Switcher Banner -->
@@ -1135,16 +1283,22 @@ const App = {
               <input type="text" id="prof-phone" class="form-input" value="${profile.phone}" required />
             </div>
             <div class="form-group col-6">
-              <label class="form-label" for="prof-zone">Zona en Tarija</label>
+              <label class="form-label" for="prof-zone">Zona habitual en Tarija</label>
               <select id="prof-zone" class="form-select">
                 ${TARIJA_ZONES.map(z => `<option value="${z}" ${profile.zone === z ? 'selected' : ''}>${z}</option>`).join('')}
               </select>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="prof-ref">Breve referencia de ubicación</label>
-            <input type="text" id="prof-ref" class="form-input" value="${profile.locationRef || ''}" />
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label class="form-label" for="prof-ref">Breve referencia de ubicación</label>
+              <input type="text" id="prof-ref" class="form-input" value="${profile.locationRef || ''}" />
+            </div>
+            <div class="form-group col-6">
+              <label class="form-label" for="prof-schedule">Horario habitual de atención</label>
+              <input type="text" id="prof-schedule" class="form-input" value="${profile.habitualSchedule || '07:00 a 14:00 (Lunes a Sábado)'}" />
+            </div>
           </div>
 
           <button type="submit" class="btn btn-secondary">Guardar datos del perfil</button>
@@ -1154,7 +1308,7 @@ const App = {
       <!-- Interests Section -->
       <div class="profile-card">
         <h2 class="card-section-title">Tus Intereses de Compra</h2>
-        <p class="card-section-desc">Selecciona los productos que más te interesan para personalizar la sección "Para ti":</p>
+        <p class="card-section-desc">Selecciona los productos que sueles comprar para alimentar las sugerencias y avisos:</p>
         <div class="interests-grid">
           ${interestCheckboxes}
         </div>
@@ -1171,8 +1325,8 @@ const App = {
             <h3 class="plan-name">Básico</h3>
             <div class="plan-price">Gratuito</div>
             <ul class="plan-features">
-              <li>✓ Publicaciones limitadas</li>
-              <li>✓ Presencia en Marketplace</li>
+              <li>✓ Funcionalidades esenciales de publicación</li>
+              <li>✓ Presencia en Marketplace Tarija</li>
               <li>✓ Contacto directo vía WhatsApp</li>
             </ul>
           </div>
@@ -1182,11 +1336,10 @@ const App = {
             <h3 class="plan-name">BuenAprovecho Pro</h3>
             <div class="plan-price">Bs 49 <span class="plan-period">/mes (Por validar)</span></div>
             <ul class="plan-features">
-              <li>✓ Publicaciones ilimitadas</li>
-              <li>✓ Estadísticas ampliadas de vistas</li>
-              <li>✓ Posibilidad de destacar lotes</li>
-              <li>✓ Mayor visibilidad prioritaria</li>
-              <li>✓ Futuras alertas a compradores clave</li>
+              <li>✓ Mayor cantidad de publicaciones simultáneas</li>
+              <li>✓ Posibilidad de destacar lotes prioritarios</li>
+              <li>✓ Estadísticas de demanda y contactos</li>
+              <li>✓ Herramientas futuras de visibilidad</li>
             </ul>
             <button class="btn btn-primary btn-sm" onclick="App.openPlansValidationModal()">Consultar plan piloto</button>
           </div>
@@ -1196,7 +1349,7 @@ const App = {
       <!-- Beta Lab Hypotheses Toggles -->
       <div class="profile-card lab-card">
         <h2 class="card-section-title">🧪 Laboratorio Beta / Hipótesis MVP</h2>
-        <p class="card-section-desc">Activa o desactiva funciones demostrativas para enseñar las diferentes hipótesis del modelo:</p>
+        <p class="card-section-desc">Activa o desactiva funciones demostrativas para validar las diferentes hipótesis del modelo:</p>
         
         <div class="lab-toggles-list">
           <label class="lab-toggle-item">
@@ -1251,6 +1404,7 @@ const App = {
     }
     Storage.saveProfile({ interests });
     UI.showToast(`Intereses actualizados: ${interests.length} seleccionados`, 'info', 2000);
+    this.updateAlertsBadge();
   },
 
   handleProfileSave(event) {
@@ -1260,8 +1414,9 @@ const App = {
     const phone = document.getElementById('prof-phone').value.trim();
     const zone = document.getElementById('prof-zone').value;
     const locationRef = document.getElementById('prof-ref').value.trim();
+    const habitualSchedule = document.getElementById('prof-schedule').value.trim();
 
-    Storage.saveProfile({ name, businessName, phone, zone, locationRef });
+    Storage.saveProfile({ name, businessName, phone, zone, locationRef, habitualSchedule });
     UI.showToast('Datos del perfil guardados');
   },
 
@@ -1388,8 +1543,8 @@ const App = {
             </div>
           </div>
 
-          <!-- Disclaimer -->
-          <p class="platform-disclaimer">BuenAprovecho facilita la conexión comercial directa entre partes en Tarija. El vendedor es responsable de la descripción fiel del lote.</p>
+          <!-- Discreet Responsibility Notice -->
+          <p class="platform-disclaimer">BuenAprovecho facilita el contacto entre las partes. La información y condición declarada del producto es responsabilidad del vendedor.</p>
 
           <!-- Action Buttons -->
           <div class="detail-actions-footer">
@@ -1441,6 +1596,7 @@ const App = {
       }
     }
     UI.showToast(res.isFavorite ? 'Lote guardado en tus favoritos' : 'Lote quitado de favoritos', 'info', 2000);
+    this.updateAlertsBadge();
     if (this.currentView === 'guardados') {
       this.renderSavedView();
     }
@@ -1464,22 +1620,22 @@ const App = {
         <p class="modal-subtitle">${lot.product} • <strong>${lot.sellerName}</strong></p>
 
         <div class="form-group">
-          <label class="form-label" for="int-quantity">Cantidad que te interesa comprar</label>
+          <label class="form-label" for="int-quantity">Cantidad deseada</label>
           <input type="text" id="int-quantity" class="form-input" value="${defaultQty}" placeholder="Ej: 20 ${lot.unit}..." />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="int-time">Horario aproximado en que podrías recoger</label>
-          <input type="text" id="int-time" class="form-input" placeholder="Ej: Hoy a las 11:30 am, mañana por la mañana..." value="Hoy en horario de recojo" />
+          <label class="form-label" for="int-time">Horario aproximado de recojo</label>
+          <input type="text" id="int-time" class="form-input" placeholder="Ej: Hoy a las 11:30 am, mañana temprano..." value="Hoy dentro del horario de recojo" />
         </div>
 
         <div class="whatsapp-preview-box">
           <div class="wa-header">
             <span class="wa-icon">💬</span>
-            <span>Mensaje que se enviará al vendedor:</span>
+            <span>Mensaje que se enviará al vendedor vía WhatsApp:</span>
           </div>
           <div id="wa-preview-text" class="wa-text-body">
-            Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${defaultQty}. ¿Sigue disponible para recoger?
+            Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${defaultQty}. ¿Sigue disponible para coordinar recojo?
           </div>
         </div>
 
@@ -1511,7 +1667,7 @@ const App = {
     const time = document.getElementById('int-time')?.value.trim() || 'Horario a coordinar';
     const profile = Storage.getProfile();
 
-    const text = `Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${qty} y podría recoger (${time}). ¿Sigue disponible?`;
+    const text = `Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${qty} y podría pasar (${time}). ¿Sigue disponible?`;
 
     // Record contact in localStorage for seller metrics
     Storage.recordContact({
@@ -1539,7 +1695,7 @@ const App = {
     const time = document.getElementById('int-time')?.value.trim() || 'Horario a coordinar';
     const profile = Storage.getProfile();
 
-    const text = `Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${qty} y podría recoger (${time}). ¿Sigue disponible?`;
+    const text = `Hola, vi tu lote de "${lot.product}" en BuenAprovecho Tarija. Me interesan ${qty} y podría pasar (${time}). ¿Sigue disponible?`;
 
     // Record contact
     Storage.recordContact({
@@ -1577,7 +1733,7 @@ const App = {
         <div class="form-group">
           <label class="form-label" for="sold-qty-input">¿Cuántos ${lot.unit} lograste vender? (Opcional)</label>
           <input type="number" id="sold-qty-input" class="form-input" value="${lot.quantity}" min="1" step="any" placeholder="Ej: ${lot.quantity}" />
-          <p class="form-help">Dato autodeclarado para tu registro comercial.</p>
+          <p class="form-help">Dato autodeclarado para tu registro comercial y estadísticas.</p>
         </div>
 
         <div class="demo-rating-box">
@@ -1688,24 +1844,31 @@ const App = {
 
   // --- Modal: Feature Lot (Destacar Lote / Monetization Demo) ---
   openFeaturedModal(lotId) {
+    const lot = Storage.getLotById(lotId);
+    if (!lot) return;
+
     const modal = document.getElementById('modal-featured');
     const content = document.getElementById('featured-modal-body');
     if (!modal || !content) return;
 
+    const isCurrentlyFeat = lot.isFeatured;
+
     content.innerHTML = `
       <div class="featured-flow">
         <div class="featured-icon">★</div>
-        <h2 class="modal-title">Destacar Lote</h2>
+        <h2 class="modal-title">${isCurrentlyFeat ? 'Lote Actualmente Destacado' : 'Destacar Lote en Tarija'}</h2>
         <div class="badge badge-warning">Función en validación</div>
         <p class="featured-explanation">
-          En el futuro, esta opción permitiría aumentar temporalmente la visibilidad de este lote colocándolo en las primeras posiciones y en la sección destacada de Tarija.
+          En el modelo definitivo, esta opción permite posicionar tu lote en los primeros lugares del marketplace y alertar prioritariamente a compradores de Tarija interesados en este rubro.
         </p>
         <div class="pilot-note-box">
           <strong>Precio piloto por validar:</strong> Sin cobro durante la fase de prueba.
         </div>
         <div class="modal-actions-bar">
           <button class="btn btn-secondary" onclick="App.closeModal('modal-featured')">Cerrar</button>
-          <button class="btn btn-primary" onclick="App.confirmToggleFeatured('${lotId}')">Probar como destacado</button>
+          <button class="btn btn-primary" onclick="App.confirmToggleFeatured('${lotId}')">
+            ${isCurrentlyFeat ? 'Quitar destacado' : 'Probar como destacado'}
+          </button>
         </div>
       </div>
     `;
@@ -1714,8 +1877,8 @@ const App = {
   },
 
   confirmToggleFeatured(lotId) {
-    Storage.toggleFeatured(lotId);
-    UI.showToast('Lote marcado como destacado para demostración');
+    const lot = Storage.toggleFeatured(lotId);
+    UI.showToast(lot.isFeatured ? '¡Lote marcado como destacado!' : 'Lote devuelto a visibilidad regular');
     this.closeModal('modal-featured');
     this.renderMyLotsView();
   },
@@ -1731,14 +1894,54 @@ const App = {
         <h2 class="modal-title">BuenAprovecho Pro</h2>
         <div class="badge badge-warning">Precio piloto por validar</div>
         <p class="featured-explanation">
-          Estamos validando qué herramientas de alto valor justifican una suscripción comercial para productores y distribuidores mayoristas en Tarija.
+          Estamos validando qué herramientas de alto valor justifican una membresía comercial para productores y mayoristas en Tarija:
         </p>
         <ul class="plan-preview-list">
-          <li>✓ Mayor rotación de excedentes</li>
+          <li>✓ Publicación ilimitada y rotación rápida de excedentes</li>
           <li>✓ Posicionamiento prioritario en Mercado Campesino y Centro</li>
-          <li>✓ Panel extendido de demanda y contactos</li>
+          <li>✓ Panel extendido de demanda y contactos de compradores</li>
         </ul>
         <button class="btn btn-primary" onclick="App.closeModal('modal-featured')">Entendido</button>
+      </div>
+    `;
+
+    modal.classList.add('active');
+  },
+
+  // --- Modal: Simulated News & Alerts Center ---
+  openAlertsModal() {
+    const alerts = Storage.getSimulatedAlerts();
+    const modal = document.getElementById('modal-alerts');
+    const content = document.getElementById('alerts-modal-body');
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <div class="alerts-center-flow">
+        <div class="alerts-center-header">
+          <div>
+            <h2 class="modal-title">Centro de Novedades y Avisos</h2>
+            <p class="modal-subtitle">Demostración de alertas de oferta y demanda en Tarija</p>
+          </div>
+        </div>
+
+        <div class="alerts-items-list">
+          ${alerts.map(a => `
+            <div class="alert-card-item" onclick="${a.lotId ? `App.openLotDetail('${a.lotId}'); App.closeModal('modal-alerts');` : `App.navigate('explorar'); App.closeModal('modal-alerts');`}">
+              <div class="alert-item-icon">${a.icon}</div>
+              <div class="alert-item-body">
+                <div class="alert-item-title">${a.title}</div>
+                <div class="alert-item-desc">${a.desc}</div>
+                <div class="alert-item-time">${a.time}</div>
+              </div>
+              <div class="alert-item-arrow">&rarr;</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="alerts-modal-footer">
+          <p class="alerts-footer-note">Avisos simulados basados en tus intereses guardados y movimientos del mercado local.</p>
+          <button class="btn btn-secondary" onclick="App.closeModal('modal-alerts')">Cerrar</button>
+        </div>
       </div>
     `;
 
@@ -1780,4 +1983,3 @@ const App = {
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
-

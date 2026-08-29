@@ -26,11 +26,10 @@ const Storage = {
       localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(['lot-01', 'lot-04']));
     }
     if (!localStorage.getItem(STORAGE_KEYS.CONTACTS)) {
-      // Seed a few initial demo contact records
       const demoContacts = [
-        { id: 'c1', lotId: 'lot-01', productName: 'Papa Holandesa', buyerName: 'Doña Teresa (Pensión)', quantity: '40 kg', time: '09:30', timestamp: '2026-08-29T07:10:00Z' },
-        { id: 'c2', lotId: 'lot-01', productName: 'Papa Holandesa', buyerName: 'Restaurante Central', quantity: '50 kg', time: '11:00', timestamp: '2026-08-29T08:00:00Z' },
-        { id: 'c3', lotId: 'lot-04', productName: 'Naranja Dulce Bermejeña', buyerName: 'Juguería El Valle', quantity: '5 cajas', time: '15:00', timestamp: '2026-08-29T06:50:00Z' }
+        { id: 'c1', lotId: 'lot-01', productName: 'Papa Holandesa (Calibre Mediano-Pequeño)', buyerName: 'Doña Teresa (Pensión El Buen Sabor)', quantity: '40 kg', time: '09:30', timestamp: '2026-08-29T07:10:00Z' },
+        { id: 'c2', lotId: 'lot-01', productName: 'Papa Holandesa (Calibre Mediano-Pequeño)', buyerName: 'Restaurante Central Tarija', quantity: '50 kg', time: '11:00', timestamp: '2026-08-29T08:00:00Z' },
+        { id: 'c3', lotId: 'lot-04', productName: 'Naranja Dulce Bermejeña (Lote Completo)', buyerName: 'Juguería El Valle', quantity: '5 cajas', time: '15:00', timestamp: '2026-08-29T06:50:00Z' }
       ];
       localStorage.setItem(STORAGE_KEYS.CONTACTS, JSON.stringify(demoContacts));
     }
@@ -67,6 +66,17 @@ const Storage = {
 
   saveLot(lotData) {
     const lots = this.getLots();
+    const profile = this.getProfile();
+
+    // Persist habitual location & schedule into profile for future ultra-fast publishing
+    if (lotData.location || lotData.pickupSchedule) {
+      this.saveProfile({
+        zone: lotData.location || profile.zone,
+        locationRef: lotData.locationRef || profile.locationRef,
+        habitualSchedule: lotData.pickupSchedule || profile.habitualSchedule
+      });
+    }
+
     if (lotData.id) {
       // Update existing
       const index = lots.findIndex(l => l.id === lotData.id);
@@ -86,8 +96,8 @@ const Storage = {
         status: 'active',
         isFeatured: false,
         coordinates: {
-          x: Math.floor(Math.random() * 50) + 25,
-          y: Math.floor(Math.random() * 50) + 25
+          x: Math.floor(Math.random() * 45) + 30,
+          y: Math.floor(Math.random() * 45) + 25
         }
       };
       lots.unshift(newLot);
@@ -169,6 +179,41 @@ const Storage = {
     }
   },
 
+  // Get smart defaults for fast publishing from previous publications or profile
+  getLastPublishDefaults() {
+    const profile = this.getProfile();
+    const myLots = this.getSellerLots();
+    if (myLots.length > 0) {
+      const last = myLots[0];
+      return {
+        location: last.location || profile.zone || 'Zona Mercado Campesino',
+        locationRef: last.locationRef || profile.locationRef || '',
+        pickupSchedule: last.pickupSchedule || profile.habitualSchedule || '07:00 a 14:00 (Lunes a Sábado)',
+        unit: last.unit || 'kg',
+        priceModality: last.priceModality || 'Bs/kg',
+        phone: profile.phone || last.sellerPhone || '+59172981234'
+      };
+    }
+    return {
+      location: profile.zone || 'Zona Mercado Campesino',
+      locationRef: profile.locationRef || 'Av. Froilán Tejerina, tinglado verde puesto 44',
+      pickupSchedule: profile.habitualSchedule || '07:00 a 14:00 (Lunes a Sábado)',
+      unit: 'kg',
+      priceModality: 'Bs/kg',
+      phone: profile.phone || '+59172981234'
+    };
+  },
+
+  getSellerLots() {
+    const profile = this.getProfile();
+    const lots = this.getLots();
+    return lots.filter(l => 
+      l.sellerName === profile.businessName || 
+      l.sellerName === profile.name ||
+      l.sellerName === 'Distribuidora San Luis'
+    );
+  },
+
   // --- Profile & Mode ---
   getProfile() {
     try {
@@ -188,7 +233,7 @@ const Storage = {
 
   switchRole(role) {
     const profile = this.getProfile();
-    profile.activeRole = role; // 'buyer' or 'seller'
+    profile.activeRole = role;
     this.saveProfile(profile);
     return profile;
   },
@@ -215,7 +260,6 @@ const Storage = {
     }
     localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favs));
 
-    // Update lot counter
     const lots = this.getLots();
     const lot = lots.find(l => l.id === lotId);
     if (lot) {
@@ -311,18 +355,82 @@ const Storage = {
     return updated;
   },
 
+  // --- Simulated Internal News / Novedades & Alerts Center ---
+  getSimulatedAlerts() {
+    const profile = this.getProfile();
+    const interests = profile.interests || [];
+    const lots = this.getLots().filter(l => l.status === 'active');
+    const favs = this.getFavorites();
+
+    const alerts = [];
+
+    // 1. Matches with user interests
+    const interestMatches = lots.filter(l => 
+      interests.some(i => l.product.toLowerCase().includes(i.toLowerCase()))
+    );
+
+    if (interestMatches.length > 0) {
+      const topMatch = interestMatches[0];
+      alerts.push({
+        id: 'alt-interest',
+        type: 'match',
+        icon: '✨',
+        title: `Nuevo lote de ${topMatch.product.split('(')[0].trim()}`,
+        desc: `Disponible en ${topMatch.location} por ${topMatch.priceModality} ${topMatch.price}`,
+        lotId: topMatch.id,
+        time: 'Hace 25 min'
+      });
+    }
+
+    // 2. Urgent / Quick exit alert
+    const urgentLots = lots.filter(l => l.quickExit);
+    if (urgentLots.length > 0) {
+      const topUrgent = urgentLots[0];
+      alerts.push({
+        id: 'alt-urgent',
+        type: 'urgent',
+        icon: '⚡',
+        title: `Salida rápida en ${topUrgent.location}`,
+        desc: `${topUrgent.product} con precio de liquidación conveniente.`,
+        lotId: topUrgent.id,
+        time: 'Hace 1 hora'
+      });
+    }
+
+    // 3. Saved lots reminder / price notification
+    if (favs.length > 0) {
+      const favLot = lots.find(l => favs.includes(l.id));
+      if (favLot) {
+        alerts.push({
+          id: 'alt-fav',
+          type: 'price',
+          icon: '🏷️',
+          title: `Oportunidad en lote guardado`,
+          desc: `${favLot.product} sigue disponible para coordinar recojo inmediato.`,
+          lotId: favLot.id,
+          time: 'Hoy'
+        });
+      }
+    }
+
+    // 4. Market demand insight for Tarija
+    alerts.push({
+      id: 'alt-demand',
+      type: 'market',
+      icon: '📈',
+      title: `Demanda activa en Mercado Campesino`,
+      desc: `Compradores gastronómicos buscando lotes de cebolla y cítricos esta mañana.`,
+      lotId: null,
+      time: 'Hoy'
+    });
+
+    return alerts;
+  },
+
   // --- Stats Calculations for "Tu Actividad" ---
   getSellerStats() {
-    const profile = this.getProfile();
-    const lots = this.getLots();
+    const myLots = this.getSellerLots();
     const contacts = this.getContacts();
-
-    // Seller's own lots match by business name or sellerName
-    const myLots = lots.filter(l => 
-      l.sellerName === profile.businessName || 
-      l.sellerName === profile.name ||
-      l.sellerName === 'Distribuidora San Luis'
-    );
 
     const activeLots = myLots.filter(l => l.status === 'active');
     const soldLots = myLots.filter(l => l.status === 'sold');
@@ -331,16 +439,29 @@ const Storage = {
     const myLotIds = new Set(myLots.map(l => l.id));
     const receivedContacts = contacts.filter(c => myLotIds.has(c.lotId));
 
-    // Sum declared sold quantities
+    // Breakdown of volume sold by product
+    const soldByProduct = {};
     let totalSoldKg = 0;
+
     soldLots.forEach(l => {
-      if (l.declaredSoldQuantity) {
-        const num = parseFloat(l.declaredSoldQuantity);
-        if (!isNaN(num)) totalSoldKg += num;
-      } else {
-        totalSoldKg += (l.quantity || 0);
-      }
+      let qty = l.declaredSoldQuantity ? parseFloat(l.declaredSoldQuantity) : (l.quantity || 0);
+      if (isNaN(qty)) qty = l.quantity || 0;
+      totalSoldKg += qty;
+
+      const prodShort = l.product.split('(')[0].trim();
+      soldByProduct[prodShort] = (soldByProduct[prodShort] || 0) + qty;
     });
+
+    // Rank my lots by total buyer interactions (contacts + views + favorites)
+    const rankedLots = [...myLots].map(l => {
+      const lotContacts = contacts.filter(c => c.lotId === l.id).length;
+      const score = (lotContacts * 10) + (l.favoritesCount || 0) * 3 + (l.viewsCount || 0);
+      return {
+        ...l,
+        contactsCount: lotContacts,
+        score
+      };
+    }).sort((a, b) => b.score - a.score);
 
     const totalViews = myLots.reduce((acc, l) => acc + (l.viewsCount || 0), 0);
     const totalFavs = myLots.reduce((acc, l) => acc + (l.favoritesCount || 0), 0);
@@ -351,10 +472,12 @@ const Storage = {
       soldLotsCount: soldLots.length,
       receivedContactsCount: receivedContacts.length,
       totalSoldDeclared: totalSoldKg,
+      soldByProduct,
       totalViews,
       totalFavs,
       myLots,
-      recentContacts: receivedContacts.slice(0, 5)
+      rankedLots,
+      recentContacts: receivedContacts.slice(0, 8)
     };
   },
 
@@ -370,4 +493,3 @@ const Storage = {
     this.init();
   }
 };
-
